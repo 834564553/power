@@ -1,0 +1,49 @@
+# status级别有8个：ALL,TRACE, DEBUG, INFO, WARN, ERROR ,FATAL,OFF
+Configuration:
+  status: warn
+  Properties: # 定义全局变量  
+    # - 表示不止一个名字，多个重名的集合
+    Property:
+    - name: log.level.console
+      value: DEBUG
+    - name: log.level.ray
+      value: DEBUG
+    - name: log.path # 日志路径
+      value: D:\boxlog\power\log
+    - name: loggiz.path # 日志压缩路径
+      value: D:\boxlog\power\$${date:yyyy-MM}\%d{yyyy-MM-dd}-%i.log.gz
+  Appenders: # Appender负责定义日志输出的目的地,它可以是控制台（Console）文件（File、RollingFile） Email（SMTP）Asyn(异步)等
+    Console:
+      name: CONSOLE
+      target: SYSTEM_OUT
+      ThresholdFilter:
+        level: ${sys:log.level.console}
+        onMatch: ACCEPT
+        onMismatch: DENY
+      PatternLayout:
+        pattern: '%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n'
+    RollingFile:
+      name: ROLLING_FILE
+      ignoreExceptions: false
+      fileName: ${log.path}
+      filePattern: ${loggiz.path}
+      PatternLayout: # 日志格式
+        pattern: '%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n'
+      Policies:
+        SizeBasedTriggeringPolicy:
+          size: 10 MB
+      DefaultRolloverStrategy:
+        max: 1000
+  Loggers:
+    Root:  # root标签为log的默认输出形式,如果一个类的log没有在loggers中明确指定其输出lever与格式，那么就会采用root中定义的格式。
+      level: info
+      AppenderRef:
+      - ref: CONSOLE
+    AsyncLogger: 
+      name: com.ray
+      additivity: false 
+      level: ${sys:log.level.ray}
+      AppenderRef:
+      - ref: CONSOLE
+      - ref: ROLLING_FILE
+      

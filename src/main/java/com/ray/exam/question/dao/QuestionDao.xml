@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ray.exam.question.dao.QuestionDao">
+
+	<sql id="findQuestion_SQL">
+		FROM exam_question q
+		where q.state=1 
+		<if test="form.type != null and form.type !=''">
+			AND q.type=#{form.type}
+		</if>
+		<if test="form.type != null and form.type !=''">
+			AND q.type=#{form.type}
+		</if>
+		<if test="form.level != null and form.level !=''">
+			AND q.level=#{form.level}
+		</if>
+		<if test="form.title != null and form.title !=''">
+			AND q.title like CONCAT('%',#{form.title},'%')
+		</if>
+	</sql>
+	<select id="query" resultType="com.ray.exam.question.model.QuestionDO">
+		select qid,type,level,title,answer,opt_a,uid,udate 
+		<include refid="findQuestion_SQL" />
+		limit #{form.start},#{form.limit}
+	</select>
+	<select id="queryCount" resultType="Integer">
+		select count(*)
+		<include refid="findQuestion_SQL" />
+	</select>
+
+</mapper>
